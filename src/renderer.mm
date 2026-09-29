@@ -93,11 +93,26 @@ static void update_state(){
 void renderer_setup(){
     dispatch_after(dispatch_time(DISPATCH_TIME_NOW,(int64_t)(2.0*NSEC_PER_SEC)),
     dispatch_get_main_queue(),^{
-        CGRect scr=[UIScreen mainScreen].bounds;
+        // iOS 26 compatible screen size
+        CGRect scr=CGRectZero;
+        NSArray<UIScene*>*scenes=[UIApplication sharedApplication].connectedScenes.allObjects;
+        for(UIScene*scene in scenes){
+            if([scene isKindOfClass:[UIWindowScene class]]){
+                UIWindowScene*ws=(UIWindowScene*)scene;
+                scr=ws.coordinateSpace.bounds;
+                break;
+            }
+        }
+        if(CGRectIsEmpty(scr))scr=CGRectMake(0,0,390,844);// fallback
         float tx=scr.size.width*0.04f,ty=scr.size.height*0.12f;
         float tw=scr.size.width*0.92f,th=scr.size.height*0.76f;
         g_table=CGRectMake(tx,ty,tw,th);
-        UIWindow*win=[[UIWindow alloc]initWithFrame:scr];
+        // iOS 26 window setup
+        UIWindowScene*ws=nil;
+        for(UIScene*scene in [UIApplication sharedApplication].connectedScenes.allObjects){
+            if([scene isKindOfClass:[UIWindowScene class]]){ws=(UIWindowScene*)scene;break;}
+        }
+        UIWindow*win=ws?[[UIWindow alloc]initWithWindowScene:ws]:[[UIWindow alloc]initWithFrame:scr];
         win.windowLevel=UIWindowLevelStatusBar+100;
         win.backgroundColor=[UIColor clearColor];
         win.userInteractionEnabled=NO;
