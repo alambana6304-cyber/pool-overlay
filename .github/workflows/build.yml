@@ -1,0 +1,40 @@
+name: Build
+
+on:
+  push:
+    branches: [ main ]
+  workflow_dispatch:
+
+jobs:
+  build:
+    runs-on: macos-latest
+    steps:
+      - uses: actions/checkout@v4
+      - name: Build dylib
+        run: |
+          SDK=$(xcrun --sdk iphoneos --show-sdk-path)
+          clang++ \
+            -arch arm64 \
+            -isysroot $SDK \
+            -std=c++17 \
+            -O2 \
+            -fvisibility=hidden \
+            -fno-exceptions \
+            -fno-rtti \
+            -dead_strip \
+            -dynamiclib \
+            -install_name @rpath/libAudioSession.dylib \
+            -framework Foundation \
+            -framework UIKit \
+            -framework QuartzCore \
+            -framework CoreGraphics \
+            -fobjc-arc \
+            -I src \
+            src/main.mm \
+            src/renderer.mm \
+            src/prediction.cpp \
+            -o libAudioSession.dylib
+      - uses: actions/upload-artifact@v4
+        with:
+          name: libAudioSession
+          path: libAudioSession.dylib
