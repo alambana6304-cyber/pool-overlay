@@ -2,8 +2,8 @@
 #include <cmath>
 struct Vec2 {
     double x=0, y=0;
-    Vec2()=default;
-    Vec2(double x,double y):x(x),y(y){}
+    constexpr Vec2()=default;
+    constexpr Vec2(double x,double y):x(x),y(y){}
     Vec2 operator+(const Vec2&o)const{return{x+o.x,y+o.y};}
     Vec2 operator-(const Vec2&o)const{return{x-o.x,y-o.y};}
     Vec2 operator*(double s)const{return{x*s,y*s};}
@@ -17,8 +17,8 @@ struct Vec2 {
 };
 struct Vec3 {
     double x=0,y=0,z=0;
-    Vec3()=default;
-    Vec3(double x,double y,double z):x(x),y(y),z(z){}
+    constexpr Vec3()=default;
+    constexpr Vec3(double x,double y,double z):x(x),y(y),z(z){}
     bool null()const{return x==0&&y==0&&z==0;}
     void zero(){x=y=z=0;}
 };
